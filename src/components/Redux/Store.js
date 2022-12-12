@@ -19,10 +19,7 @@ const persistConfig = {
   storage,
 };
 
-export const mainReducer = persistReducer(
-  persistConfig,
-  contactsReducer.reducer
-);
+export const mainReducer = persistReducer(persistConfig, contactsReducer);
 
 export const store = configureStore({
   reducer: {

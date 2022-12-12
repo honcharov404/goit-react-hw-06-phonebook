@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { addContact, deleteContact } from './Redux/ContactsSlice/ContactsSlice';
@@ -37,10 +36,6 @@ export const App = () => {
 
     dispatch(setFilter(filter));
   };
-
-  // useEffect(() => {
-  //   localStorage.setItem('contacts', JSON.stringify(contacts));
-  // }, [contacts]);
 
   const filterContacts = () => {
     return contacts.filter(contact =>
