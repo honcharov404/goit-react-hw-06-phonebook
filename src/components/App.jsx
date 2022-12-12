@@ -1,23 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { nanoid } from 'nanoid';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { addContact, deleteContact } from './Redux/ContactsSlice/ContactsSlice';
 
 import Filter from './Filter/Filter';
 import ContactList from './ContactList/ContactList';
 import ContactForm from './ContactForm/ContactForm';
 
 import s from './App.module.css';
+import { setFilter } from './Redux/FilterSlice/FilterSlice';
 
 export const App = () => {
-  const [contacts, setContacts] = useState(
-    JSON.parse(localStorage.getItem('contacts')) || []
-  );
-  const [filter, setFilter] = useState('');
+  const contacts = useSelector(state => state.contacts.contacts);
+  const filter = useSelector(state => state.filter.filter);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  const addContact = (name, number) => {
+  const onAddContact = (name, number) => {
     if (
       contacts.find(
         contact => contact.name.toLowerCase() === name.toLowerCase()
@@ -27,16 +25,22 @@ export const App = () => {
       return;
     }
 
-    setContacts(prevContacts => {
-      return prevContacts.slice(0).concat({ id: nanoid(), name, number });
-    });
+    dispatch(addContact({ name, number }));
   };
 
-  const installFilter = e => {
+  const onDeleteContact = contactId => {
+    dispatch(deleteContact(contactId.target.value));
+  };
+
+  const onSetFilter = e => {
     const filter = e.target.value;
 
-    setFilter(filter);
+    dispatch(setFilter(filter));
   };
+
+  // useEffect(() => {
+  //   localStorage.setItem('contacts', JSON.stringify(contacts));
+  // }, [contacts]);
 
   const filterContacts = () => {
     return contacts.filter(contact =>
@@ -44,21 +48,16 @@ export const App = () => {
     );
   };
 
-  const deleteContact = e => {
-    const deletedContactId = e.target.value;
-
-    setContacts(prevContacts =>
-      prevContacts.filter(contact => contact.id !== deletedContactId)
-    );
-  };
-
   return (
     <div className={s.App}>
       <h1 className={s.mainTitle}>Phonebook</h1>
-      <ContactForm addContact={addContact} />
+      <ContactForm addContact={onAddContact} />
       <h2 className={s.title}>Contacts</h2>
-      <Filter filter={filter} setFilter={installFilter} />
-      <ContactList contacts={filterContacts()} deleteContact={deleteContact} />
+      <Filter filter={filter} setFilter={onSetFilter} />
+      <ContactList
+        contacts={filterContacts()}
+        deleteContact={onDeleteContact}
+      />
     </div>
   );
 };
